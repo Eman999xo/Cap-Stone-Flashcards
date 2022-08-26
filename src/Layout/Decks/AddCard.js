@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, Link, useParams } from "react-router-dom";
 import { createCard, readDeck } from "../../utils/api";
+import CardForm from "./CardForm";
 
 function AddCard() {
   const history = useHistory();
@@ -17,22 +18,18 @@ function AddCard() {
     fetchDecks();
   }, [deckId, setDeckName]);
 
-  async function saveHandler(event) {
-    event.preventDefault();
-    console.log("form submitted")
-    await createCard(deckId, newCard);
-    console.log("card created")
-    //console.log(data);
-    history.push(`/decks/${deckId}`);
-    setNewCard({});
-  }
-  function handleFrontChange(event) {
-    setNewCard({ ...newCard, front: event.target.value });
+
+  function handleInputChange({target}) {
+    setNewCard({ ...newCard, [target.name]: target.value });
   }
 
-  function handleBackChange(event) {
-    setNewCard({ ...newCard, back: event.target.value });
+  const saveHandler = async (event) => {
+    event.preventDefault();
+    await createCard(deckId, newCard);
+    history.push(`/decks/${deckId}`);
   }
+ 
+
   console.log("newcard", newCard);
   return (
     <div className="col-12 mx-auto">
@@ -52,35 +49,11 @@ function AddCard() {
         </ol>
       </nav>
       <h1>{deckName.name}: Add Card</h1>
-      <form onSubmit={saveHandler} >
-        <label htmlFor="front">Front</label>
-        <textarea
-          className="form-control"
-          id="front"
-          rows="3"
-          placeholder="Front side of card"
-          onChange={handleFrontChange}
-        ></textarea>
-        <label htmlFor="back">Back</label>
-        <textarea
-          className="form-control"
-          id="back"
-          rows="3"
-          placeholder="Back side of card"
-          onChange={handleBackChange}
-        ></textarea>
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={() => history.push(`/decks/${deckId}`)}
-        >
-          Done
-        </button>
-        <button type="submit" className="btn btn-primary">
-          Save
-        </button>
-      </form>
-    </div>
+      <div>
+        <CardForm saveHandler={saveHandler} handleInputChange={handleInputChange} newCard={newCard} deckId={deckId}/>
+      </div>
+      
+      </div>
   );
 }
 
